@@ -3,11 +3,11 @@ import { Card, Text, Avatar, ListItem } from 'react-native-elements';
 import { PARTNERS } from '../shared/partners';
 import { useState } from 'react';
 
-const AboutScreen = () => {
-    const [partners, setPartners] = useState(PARTNERS);
 
-    const Mission = () => {
-        return (
+
+const Mission = () => {
+    return (
+        <ScrollView>
             <Card>
                 <Card.Title>Our Mission</Card.Title>
                 <Card.Divider />
@@ -21,27 +21,30 @@ const AboutScreen = () => {
                     campers to share reviews on campsites they have visited with each other.
                 </Text>
             </Card>
-        )
-    }
+        </ScrollView>
+    )
+};
 
+const AboutScreen = () => {
+    const [partners, setPartners] = useState(PARTNERS);
     return (
         <ScrollView>
             <Mission />
             <Card>
                 <Card.Title>Community Partners</Card.Title>
                 <Card.Divider />
-                {partners.map(({ partner }) => {
-                    <ListItem key={partner.id}>
-                        <Avatar rounded source={partner.image} />
+                {partners.map((partner) => (
+                    <ListItem key={partner.id} >
+                        <Avatar rounded source={partner.image} >
+                        </Avatar>
                         <ListItem.Content>
                             <ListItem.Title>{partner.name}</ListItem.Title>
                             <ListItem.Subtitle>{partner.description}</ListItem.Subtitle>
                         </ListItem.Content>
                     </ListItem>
-                })}
+                ))}
             </Card>
         </ScrollView>
-
     )
 };
 
