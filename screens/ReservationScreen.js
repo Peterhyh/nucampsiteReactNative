@@ -5,7 +5,8 @@ import {
     ScrollView,
     StyleSheet,
     Switch,
-    Button
+    Button,
+    Modal
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -17,6 +18,9 @@ const ReservationScreen = () => {
     const [date, setDate] = useState(new Date());
     const [showCalendar, setShowCalendar] = useState(false);
 
+    //Using a local state to see if the Modal will be shown or not. True=Modal shown False=Modal hidden
+    const [showModal, setShowModal] = useState(false);
+
     //when a date is selected, we will be setting the date state variable with the setDate function
     const onDateChange = (event, selectedDate) => {
         const currentDate = selectedDate || date;
@@ -24,13 +28,17 @@ const ReservationScreen = () => {
         setDate(currentDate);
     };
 
-    //Used by the reservation screen when the form is submitted. 
+    //Logging the form values from the state, to the console, then displaying the Modal.
+    //We use '!showModal' because the default was set to 'false' above (useState).
     const handleReservation = () => {
         //This will echo back values using console.log. 
         console.log('campers:', campers);
         console.log('hikeIn:', hikeIn);
         console.log('date:', date);
-        //Resetting state variables back to the their inital values.
+        setShowModal(!showModal);
+    };
+    //Resetting the state to its initial values
+    const resetForm = () => {
         setCampers(1);
         setHikeIn(false);
         setDate(new Date());
@@ -103,27 +111,21 @@ const ReservationScreen = () => {
                     accessibilityLabel='Tap me to select a reservation date'
                 />
             </View>
-            <View>
-                {
-                    //Setting up the date/time picker component, to give user a way to select the date of reservation 
-                    //on the calendar. NOTE: only show the datetime picker if the show calendar state variable is set 
-                    //to TRUE from the user clicking the button above. 
-                    //If showCalendar is false, the DateTimePicker will not show at all.
-                    //This is a conditional statement without using the If statement 
-                    showCalendar && (
-                        <DateTimePicker
-                            style={styles.formItem}
-                            value={date}
-                            mode='date'
-                            display='default'
-                            onChange={onDateChange}
-                        />
-                    )}
+            <View //Setting up the DateTimePicker component, to give user a way to select the date of reservation on the calendar. NOTE: only show the DateTimePicker if the show calendar state variable is set to TRUE from the user clicking the button above. If showCalendar is false, the DateTimePicker will not show at all. This is a conditional statement without using the If statement
+            >
+                {showCalendar && (
+                    <DateTimePicker
+                        style={styles.formItem}
+                        value={date}
+                        mode='date'
+                        display='default'
+                        onChange={onDateChange}
+                    />
+                )}
             </View>
-            {
-                //Button creation to submit
-            }
-            <View style={styles.formRow}>
+            <View //Button creation to submit
+                style={styles.formRow}
+            >
                 <Button
                     onPress={() => handleReservation()}
                     title='Search Availability'
@@ -131,6 +133,39 @@ const ReservationScreen = () => {
                     accessibilityLabel='Tap me to search for availiable campsites to reserve'
                 />
             </View>
+            <Modal // Adding the Modal. We can add modal animation like slide, fade, or none.
+                animationType='slide'
+                transparent={false}
+                //if showModal is false,visibility will be false, vice versa
+                visible={showModal}
+                //This will be triggered if the user uses the hardware back button to close the Modal.
+                onRequestClosed={() => setShowModal(!showModal)}
+            >
+                <View // Creating the UI of the Modal
+                    style={styles.modal}
+                >
+                    <Text style={styles.modalTitle}>
+                        Search Campsite Reservations
+                    </Text>
+                    <Text style={styles.modalText}>
+                        Number of Campers: {campers}
+                    </Text>
+                    <Text style={styles.modalText}>
+                        Hike-In?: {hikeIn ? 'Yes' : 'No'}
+                    </Text>
+                    <Text style={styles.modalText}>
+                        Date: {date.toLocaleDateString('en-US')}
+                    </Text>
+                    <Button
+                        onPress={() => {
+                            setShowModal(!showModal);
+                            resetForm()
+                        }}
+                        color='#5637DD'
+                        title='Close'
+                    />
+                </View>
+            </Modal>
         </ScrollView>
     );
 };
@@ -149,6 +184,22 @@ const styles = StyleSheet.create({
     },
     formItem: {
         flex: 1
+    },
+    modal: {
+        justifyContent: 'center',
+        margin: 20
+    },
+    modalTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        backgroundColor: '#5637DD',
+        textAlign: 'center',
+        color: '#fff',
+        marginBottom: 20
+    },
+    modalText: {
+        fontSize: 18,
+        margin: 10
     }
 });
 
