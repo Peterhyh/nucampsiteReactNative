@@ -20,13 +20,13 @@ export const postComment = createAsyncThunk(
     async (payload, { dispatch, getState }) => {
         setTimeout(() => {
             const { comments } = getState();
-            const d = new Date();
-            payload.date = d.toDateString();
-            payload.id = comments.commentsArray.length;
-            dispatch(addComment(payload));
+            payload.date = new Date().toISOString()
+            payload.id = comments.commentsArray.length
+            dispatch(addComment(payload))
         }, 2000);
     }
 )
+
 
 const commentsSlice = createSlice({
     name: 'comments',
