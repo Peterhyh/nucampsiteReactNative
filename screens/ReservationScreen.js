@@ -11,6 +11,7 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Animatable from 'react-native-animatable';
+import * as Notifications from 'expo-notifications';
 
 const ReservationScreen = () => {
     //tracking the value in our reservation form. One state variable for each input
@@ -44,6 +45,32 @@ const ReservationScreen = () => {
         setHikeIn(false);
         setDate(new Date());
         setShowCalendar(false);
+    };
+
+    const presentLocalNotification = async (reservationDate) => {
+        const sendNotification = () => {
+            Notifications.setNotificationHandler({
+                handleNotification: async () => ({
+                    shouldShowAlert: true,
+                    shouldPlaySound: true,
+                    shouldSetBadge: true
+                })
+            });
+            Notifications.scheduleNotificationAsync({
+                content: {
+                    title: 'Your Campsite Notification Search',
+                    body: `search for ${reservationDate} requested`
+                },
+                trigger: null
+            });
+        };
+        let permissions = await Notifications.getPermissionsAsync();
+        if (!permissions.granted) {
+            permissions = await Notifications.requestPermissionsAsync();
+        }
+        if (permissions.granted) {
+            sendNotification();
+        }
     };
 
     //returning a ScrollView, using View component with formRow style for each of our inputs, 
@@ -143,6 +170,7 @@ const ReservationScreen = () => {
                                 {
                                     text: 'OK',
                                     onPress: () => {
+                                        presentLocalNotification(date.toLocaleDateString('en-US'));
                                         handleReservation();
                                         resetForm();
                                     }
